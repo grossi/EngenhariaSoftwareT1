@@ -27,41 +27,97 @@ public class DatabaseOperator {
 	public static DatabaseOperator getInstance(){
 		if (database_instance == null){
 			database_instance = new DatabaseOperator();
-			try {
-				Class.forName("org.postgresql.Driver");
-			} catch (ClassNotFoundException e) {
-				System.out.println("Where is your PostgreSQL JDBC Driver? "
-						+ "Include in your library path!");
-				e.printStackTrace();
-				System.exit(0);
-			}
-	 
-			System.out.println("PostgreSQL JDBC Driver Registered!");
 		}
 		
 		return database_instance;
 	}
 	
-     public void createTableProjects(){
-    	 //exemplo de criação de tabela
-    	 try {
+	public void initialize(){
+
+		findDriver();
+		connectToDabatase();
+		// initialize all tables
+		createTableProjectsIfNotExists();
+	}
+	
+	private void findDriver(){
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e) {
+			System.out.println("Where is your PostgreSQL JDBC Driver? "
+					+ "Include in your library path!");
+			e.printStackTrace();
+			System.exit(0);
+		}
+	}
+	
+	private void connectToDabatase(){
+		try {
 			c = DriverManager.getConnection(DatabaseOperator.URL, 
 					 						 DatabaseOperator.USER, 
 					 						 DatabaseOperator.PASSWORD);
-			System.out.println("Opened database successfully");
-			
+		}
+		catch ( Exception e ) {
+			System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}	
+	}
+	
+    private void createTableProjectsIfNotExists(){
+    	try {
 			stmt = c.createStatement();
-			String sql = "CREATE TABLE Projects " +
-			          	"(ID INT PRIMARY KEY     NOT NULL," +
-			          	" NAME           TEXT    NOT NULL, " +
-			          	" DATE           NUMERIC(30)     NOT NULL)"; // storage date in milliseconds
+			String sql = "CREATE TABLE IF NOT EXISTS Projects " +
+		          		"(id 		SERIAL PRIMARY KEY  NOT NULL," +
+			          	" name      TEXT    		 	NOT NULL, " +
+			          	" date      NUMERIC(30)     	NOT NULL)"; // storage date in milliseconds
 			stmt.executeUpdate(sql);
 			System.out.println("Table created successfully");
 			stmt.close();
-			c.close();
+			
 			System.out.println("Opened database successfully closed");
-    	 } catch ( Exception e ) {
+			
+    	} catch ( Exception e ) {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
-    	 }
-     }
+    	}
+    }
+     
+    public void insertProject(String name){
+    	try { 			
+    		java.util.Date date= new java.util.Date();
+ 			
+ 			if(!ifProjectExists(name)){
+ 				stmt = c.createStatement();
+ 	 			String sql = "INSERT INTO Projects (name, date) " +
+ 	 			           	 " VALUES ( '" + name + "','" + String.valueOf(date.getTime()) + "')"; // storage date in milliseconds
+ 	 			stmt.executeUpdate(sql);
+ 	 			System.out.println("Project inserted successfully!");
+ 	 			stmt.close();
+ 	 			c.close();
+ 	        }
+ 			
+     	} catch ( Exception e ) {
+     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+     	}
+    }
+     
+    private boolean ifProjectExists(String name){
+    	try {
+    		stmt = c.createStatement();
+  			String sql = "SELECT name " +
+  			           	 "FROM Projects "+
+  			           	 "WHERE name = '" + name + "';";
+
+  			ResultSet result = stmt.executeQuery(sql);
+  			while (result.next()){
+  				System.out.println("Project already exists!");
+  				return true;
+  			}
+  			System.out.println("Project not exists!");
+  			stmt.close();
+  			return false;
+      	} catch ( Exception e ) {
+      		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+      		System.exit(0);
+      	}
+		return false;
+    }
 }

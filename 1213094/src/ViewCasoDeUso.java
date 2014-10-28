@@ -1,5 +1,3 @@
-import java.awt.Color;
-import java.awt.Component;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -27,11 +25,9 @@ public class ViewCasoDeUso extends JPanel{
 	private ArrayList<JTextField>	pontos_de_extensao_list;
 	private ArrayList<JTextField>	fluxo_principal_list;
 	private ArrayList<JTextField>	extensoes_list;
-	private int model;
 	
 	public ViewCasoDeUso(int model){
 		super();
-		this.model = model;
 		if (model == MODEL_PRIMARY){
 			this.trigger = null;
 		}
@@ -47,6 +43,7 @@ public class ViewCasoDeUso extends JPanel{
 		this.pre_condicoes = new JTextField(50);
 		this.pos_condicoes = new JTextField(50);
 		
+		this.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		this.add(createMainBox());
 	}
 	
