@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>lib/postgresql-9.3-1102.jdbc3.jar</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/postgresql-9.3-1102.jdbc3.jar</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

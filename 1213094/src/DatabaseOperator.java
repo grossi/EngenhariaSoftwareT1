@@ -5,10 +5,8 @@
  * */
 
 import java.sql.*;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Vector;
 
 
 public class DatabaseOperator {
@@ -79,6 +77,25 @@ public class DatabaseOperator {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
     }
+    
+    public String getProjectName(int id){
+    	String name = "";
+    	try {
+			stmt = c.createStatement();
+			
+			String sql = "SELECT name FROM Projects";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				name = result.getString("name");
+			}
+			
+			System.out.println("Opened database successfully closed");
+			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return name;
+    }
      
     public void insertProject(String name){
     	try { 			
@@ -91,7 +108,6 @@ public class DatabaseOperator {
  	 			stmt.executeUpdate(sql);
  	 			System.out.println("Project inserted successfully!");
  	 			stmt.close();
- 	 			c.close();
  	        }
  			
      	} catch ( Exception e ) {
@@ -119,5 +135,22 @@ public class DatabaseOperator {
       		System.exit(0);
       	}
 		return false;
+    }
+    
+    public Vector<String> listProjects(){
+    	Vector<String> project_list = new Vector<String>();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT name FROM Projects";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				project_list.add(result.getString("name"));
+			}
+			stmt.close();
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	
+    	return project_list;
     }
 }

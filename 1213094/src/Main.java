@@ -28,7 +28,7 @@ public class Main {
         db_operator.initialize();
         db_operator.insertProject("teste");
         
-        mainFrame.getContentPane().add(listCasosDeUso);
+        mainFrame.getContentPane().add(new InitialScreen());
         mainFrame.setSize(800, 500);
         
         //Display the window.
