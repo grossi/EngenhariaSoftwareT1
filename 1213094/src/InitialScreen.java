@@ -33,10 +33,21 @@ public class InitialScreen extends JPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("asd");
 				DatabaseOperator.getInstance().insertProject(new_project_name.getText());
 			}
 		});
+		
+		load.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				//Aqui deveria ser o ID, nao o nome
+				//TODO: Database.GetIdFromName()
+				ProjectScreen ps = new ProjectScreen(projects.getItemAt(projects.getSelectedIndex()));
+				ps.setVisible(true);
+			}
+		});
+		
 		this.add(createMainBox());
 	}
 	
