@@ -43,6 +43,7 @@ public class InitialScreen extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				//Aqui deveria ser o ID, nao o nome
 				//TODO: Database.GetIdFromName()
+				Main.changeScreen(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName(projects.getItemAt(projects.getSelectedIndex()))));
 				ProjectScreen ps = new ProjectScreen(projects.getItemAt(projects.getSelectedIndex()));
 				ps.setVisible(true);
 			}

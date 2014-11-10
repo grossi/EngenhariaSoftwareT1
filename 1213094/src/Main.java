@@ -3,9 +3,17 @@ import java.awt.Dimension;
 import javax.swing.*;        
  
 public class Main {
+	static JFrame mainFrame;
+	
+	static void changeScreen(JPanel frame){
+		mainFrame.removeAll();
+        mainFrame.getContentPane().add(frame);
+        mainFrame.setSize(800, 500);
+	}
+	
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame mainFrame = new JFrame("Editor de Casos de Uso");
+        mainFrame = new JFrame("Editor de Casos de Uso");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         ViewCasoDeUso teste_modelo_principal = new ViewCasoDeUso(ViewCasoDeUso.MODEL_PRIMARY);

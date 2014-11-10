@@ -264,5 +264,22 @@ public class DatabaseOperator {
     	}
     	return actors_list;
     }
+
+	public String getProjectIdFromName(String id) {
+		System.out.println("id = " + id);
+    	String project_name = new String();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT id FROM projects WHERE name = " + id;
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				project_name = result.getString("name");
+			}
+			stmt.close();
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return project_name;
+	}
     
 }
