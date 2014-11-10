@@ -265,21 +265,21 @@ public class DatabaseOperator {
     	return actors_list;
     }
 
-	public String getProjectIdFromName(String id) {
-		System.out.println("id = " + id);
-    	String project_name = new String();
+	public int getProjectIdFromName(String name) {
+		System.out.println("name = " + name);
+    	int project_id = 0;
     	try {
 			stmt = c.createStatement();
-			String sql = "SELECT id FROM projects WHERE name = " + id;
+			String sql = "SELECT id FROM projects WHERE name = '" + name + "'";
 			ResultSet result = stmt.executeQuery(sql);
 			while (result.next()){
-				project_name = result.getString("name");
+				project_id = result.getInt("id");
 			}
 			stmt.close();
     	} catch ( Exception e ) {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
-    	return project_name;
+    	return project_id;
 	}
     
 }

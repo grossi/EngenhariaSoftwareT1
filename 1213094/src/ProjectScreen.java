@@ -24,10 +24,10 @@ public class ProjectScreen extends JPanel {
 	private JTextField new_actor_name;
 	private JTextField new_use_case_name;
 	
-	public ProjectScreen(String id) {
+	public ProjectScreen(int id) {
 		super();
 		
-		final String project_id = id;
+		final int project_id = id;
 		
 		new_actor_name = new JTextField(20);
 		new_use_case_name = new JTextField(20);
@@ -37,17 +37,17 @@ public class ProjectScreen extends JPanel {
 		
 		load = new JButton("Load");
 		
-		Vector<String> use_case_list = DatabaseOperator.getInstance().listUseCases(id);
+		Vector<String> use_case_list = DatabaseOperator.getInstance().listUseCases(String.valueOf(id));
 		use_cases = new JComboBox<String>(use_case_list);
 		
-		Vector<String> actors_list = DatabaseOperator.getInstance().listActors(id);
+		Vector<String> actors_list = DatabaseOperator.getInstance().listActors(String.valueOf(id));
 		actors = new JComboBox<String>(actors_list);
 		
 		create_use_case.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				DatabaseOperator.getInstance().insertUseCase(new_use_case_name.getText(), project_id);
+				DatabaseOperator.getInstance().insertUseCase(new_use_case_name.getText(), String.valueOf(project_id));
 			}
 		});
 		
@@ -55,7 +55,7 @@ public class ProjectScreen extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				DatabaseOperator.getInstance().insertActor(new_actor_name.getText(), project_id);
+				DatabaseOperator.getInstance().insertActor(new_actor_name.getText(), String.valueOf(project_id));
 			}
 		});
 		

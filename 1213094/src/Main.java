@@ -3,9 +3,9 @@ import java.awt.Dimension;
 import javax.swing.*;        
  
 public class Main {
-	static JFrame mainFrame;
+	private static JFrame mainFrame;
 	
-	static void changeScreen(JPanel frame){
+	public static void changeScreen(JPanel frame){
 		mainFrame.removeAll();
         mainFrame.getContentPane().add(frame);
         mainFrame.setSize(800, 500);
