@@ -36,5 +36,9 @@ Icon
 .Spotlight-V100
 .Trashes
 
-.bin
-.class
+*.bin
+*.class
+*/*.class
+*\*.class
+**\*.class
+**/*.class

@@ -36,6 +36,8 @@ public class DatabaseOperator {
 		connectToDabatase();
 		// initialize all tables
 		createTableProjectsIfNotExists();
+		createTableActorsIfNotExists();
+		createTableUseCasesIfNotExists();
 	}
 	
 	private void findDriver(){
@@ -59,7 +61,7 @@ public class DatabaseOperator {
 			System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}	
 	}
-	
+
     private void createTableProjectsIfNotExists(){
     	try {
 			stmt = c.createStatement();
@@ -73,6 +75,43 @@ public class DatabaseOperator {
 			
 			System.out.println("Opened database successfully closed");
 			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    }
+
+    private void createTableActorsIfNotExists(){
+    	try {
+			stmt = c.createStatement();
+			String sql = " CREATE TABLE IF NOT EXISTS actors" +
+						   " (id serial PRIMARY KEY NOT NULL," +
+						    " name TEXT NOT NULL," +
+						     " projectId INTEGER NOT NULL," +
+						     " CONSTRAINT actors_fkey FOREIGN KEY (projectId) REFERENCES projects(id))" ;
+						    
+			stmt.executeUpdate(sql);
+			System.out.println("Table created successfully");
+			stmt.close();
+			
+			System.out.println("Opened database successfully closed");
+			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    }
+    
+    private void createTableUseCasesIfNotExists(){
+    	try {
+			stmt = c.createStatement();
+			String sql = "CREATE TABLE IF NOT EXISTS use_cases" + 
+					"		  (id serial PRIMARY KEY NOT NULL," +
+					"		  name text," +
+					"		  projectId INTEGER NOT NULL, " +
+					" CONSTRAINT use_cases_fkey FOREIGN KEY (projectId) REFERENCES projects(id))";
+			stmt.executeUpdate(sql);
+			System.out.println("Table created successfully");
+			stmt.close();
+			System.out.println("Opened database successfully closed");
     	} catch ( Exception e ) {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
@@ -97,7 +136,7 @@ public class DatabaseOperator {
     	return name;
     }
      
-    public void insertProject(String name){
+    public boolean insertProject(String name){
     	try { 			
     		java.util.Date date= new java.util.Date();
  			
@@ -108,44 +147,57 @@ public class DatabaseOperator {
  	 			stmt.executeUpdate(sql);
  	 			System.out.println("Project inserted successfully!");
  	 			stmt.close();
+ 	 			return true;
+ 	        } 
+ 			else {
+ 	        	return false;
  	        }
- 			
      	} catch ( Exception e ) {
      		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
      	}
+    	return false;
     }
     
-    public void insertActor(String name, String id){
+    public boolean insertActor(String name, String id){
     	try { 			
- 			
  			if(!ifActorExists(name, id)){
  				stmt = c.createStatement();
- 	 			String sql = "INSERT INTO Actors (name, id) " +
- 	 			           	 " VALUES ( '" + name + "','" + id + "')"; 
+ 	 			String sql = "INSERT INTO Actors (name, projectId) " +
+ 	 			           	 " VALUES ( '" + name + "'," + id + ")"; 
  	 			stmt.executeUpdate(sql);
  	 			System.out.println("Actor inserted successfully!");
  	 			stmt.close();
+ 				return true;
  	        }
+ 			else{
+ 				return false;
+ 			}
  			
      	} catch ( Exception e ) {
      		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
      	}
+			return false;
     }
     
-    public void insertUseCase(String name, String id){
+    public boolean insertUseCase(String name, String id){
     	try { 			
  			if(!ifUseCaseExists(name, id)){
  				stmt = c.createStatement();
- 	 			String sql = "INSERT INTO Use_cases (name, id) " +
- 	 			           	 " VALUES ( '" + name + "','" + id + "')"; // storage date in milliseconds
+ 	 			String sql = "INSERT INTO Use_cases (name, projectId) " +
+ 	 			           	 " VALUES ( '" + name + "'," + id + ")"; // storage date in milliseconds
  	 			stmt.executeUpdate(sql);
  	 			System.out.println("Use_case inserted successfully!");
  	 			stmt.close();
+ 	 			return true;
  	        }
+ 			else{
+ 				return false;
+ 			}
  			
      	} catch ( Exception e ) {
      		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
      	}
+		return false;
     }
      
     private boolean ifProjectExists(String name){
@@ -175,8 +227,8 @@ public class DatabaseOperator {
     		stmt = c.createStatement();
   			String sql = "SELECT name " +
 			           	 "FROM Actors "+
-			           	 "WHERE name = '" + name + "AND" +
-			           	 "project = " + id + "';";
+			           	 "WHERE name = '" + name + "' AND " +
+			           	 "projectId = " + id + ";";
   			
   			ResultSet result = stmt.executeQuery(sql);
   			while (result.next()){
@@ -198,8 +250,8 @@ public class DatabaseOperator {
     		stmt = c.createStatement();
   			String sql = "SELECT name " +
 		           	 "FROM Use_cases "+
-		           	 "WHERE name = '" + name + "AND" +
-		           	 "project = " + id + "';";
+		           	 "WHERE name = '" + name + "' AND " +
+		           	 "projectId = " + id + ";";
   			ResultSet result = stmt.executeQuery(sql);
   			while (result.next()){
   				System.out.println("Use_case already exists!");
@@ -236,7 +288,7 @@ public class DatabaseOperator {
     	Vector<String> use_case_list = new Vector<String>();
     	try {
 			stmt = c.createStatement();
-			String sql = "SELECT name FROM Use_cases WHERE project = " + id;
+			String sql = "SELECT name FROM Use_cases WHERE projectId = " + id;
 			ResultSet result = stmt.executeQuery(sql);
 			while (result.next()){
 				use_case_list.add(result.getString("name"));
@@ -253,7 +305,7 @@ public class DatabaseOperator {
     	Vector<String> actors_list = new Vector<String>();
     	try {
 			stmt = c.createStatement();
-			String sql = "SELECT name FROM actors WHERE project = " + id;
+			String sql = "SELECT name FROM actors WHERE projectId = " + id;
 			ResultSet result = stmt.executeQuery(sql);
 			while (result.next()){
 				actors_list.add(result.getString("name"));
@@ -265,21 +317,20 @@ public class DatabaseOperator {
     	return actors_list;
     }
 
-	public String getProjectIdFromName(String id) {
-		System.out.println("id = " + id);
-    	String project_name = new String();
+	public String getProjectIdFromName(String name) {
+    	String project_id = new String();
     	try {
 			stmt = c.createStatement();
-			String sql = "SELECT id FROM projects WHERE name = " + id;
+			String sql = "SELECT id FROM projects WHERE name = '" + name + "'";
 			ResultSet result = stmt.executeQuery(sql);
 			while (result.next()){
-				project_name = result.getString("name");
+				project_id = String.valueOf(result.getInt("id"));
 			}
 			stmt.close();
     	} catch ( Exception e ) {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
-    	return project_name;
+    	return project_id;
 	}
     
 }

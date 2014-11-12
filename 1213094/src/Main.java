@@ -1,4 +1,5 @@
 import java.awt.Dimension;
+import java.awt.EventQueue;
 
 import javax.swing.*;        
  
@@ -6,10 +7,10 @@ public class Main {
 	static JFrame mainFrame;
 	
 	static void changeScreen(JPanel frame){
-		mainFrame.removeAll();
+		mainFrame.getContentPane().removeAll();
         mainFrame.getContentPane().add(frame);
-        mainFrame.setSize(800, 500);
-	}
+        mainFrame.getContentPane().revalidate();
+    }
 	
     private static void createAndShowGUI() {
         //Create and set up the window.
@@ -37,6 +38,8 @@ public class Main {
         db_operator.insertProject("teste");
         
         mainFrame.getContentPane().add(new InitialScreen());
+        
+//        mainFrame.getContentPane().add(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName("teste")));
         mainFrame.setSize(800, 500);
         
         //Display the window.
@@ -46,7 +49,7 @@ public class Main {
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
             }

@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 
 public class ProjectScreen extends JPanel {
 	
-	
+	final String project_id;
 	
 	private JButton create_actor;
 	private JButton create_use_case;
@@ -24,10 +24,13 @@ public class ProjectScreen extends JPanel {
 	private JTextField new_actor_name;
 	private JTextField new_use_case_name;
 	
+	private Vector<String> use_case_list;
+	private Vector<String> actors_list;
+	
 	public ProjectScreen(String id) {
 		super();
 		
-		final String project_id = id;
+		project_id = id;
 		
 		new_actor_name = new JTextField(20);
 		new_use_case_name = new JTextField(20);
@@ -37,17 +40,21 @@ public class ProjectScreen extends JPanel {
 		
 		load = new JButton("Load");
 		
-		Vector<String> use_case_list = DatabaseOperator.getInstance().listUseCases(id);
+		use_case_list = DatabaseOperator.getInstance().listUseCases(id);
 		use_cases = new JComboBox<String>(use_case_list);
 		
-		Vector<String> actors_list = DatabaseOperator.getInstance().listActors(id);
+		actors_list = DatabaseOperator.getInstance().listActors(id);
 		actors = new JComboBox<String>(actors_list);
 		
 		create_use_case.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				DatabaseOperator.getInstance().insertUseCase(new_use_case_name.getText(), project_id);
+				if (new_actor_name.getText() != ""){
+					if(DatabaseOperator.getInstance().insertUseCase(new_use_case_name.getText(), project_id)){
+						use_case_list.add(new_use_case_name.getText());
+					}
+				}
 			}
 		});
 		
@@ -55,7 +62,11 @@ public class ProjectScreen extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				DatabaseOperator.getInstance().insertActor(new_actor_name.getText(), project_id);
+				if (new_actor_name.getText() != ""){
+					if(DatabaseOperator.getInstance().insertActor(new_actor_name.getText(), project_id)){
+						actors_list.add(new_actor_name.getText());
+					}
+				}
 			}
 		});
 		
@@ -92,6 +103,4 @@ public class ProjectScreen extends JPanel {
 		
 		return main_box;
 	}
-
-
 }
