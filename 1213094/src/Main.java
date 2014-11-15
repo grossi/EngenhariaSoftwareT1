@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import javax.swing.*;        
  
 public class Main {
-	static JFrame mainFrame;
+	private static JFrame mainFrame;
 	
 	static void changeScreen(JPanel frame){
 		mainFrame.getContentPane().removeAll();
