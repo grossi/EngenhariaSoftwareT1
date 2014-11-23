@@ -4,6 +4,7 @@
  * 
  * */
 
+import java.awt.LayoutManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -38,6 +39,7 @@ public class DatabaseOperator {
 		createTableProjectsIfNotExists();
 		createTableActorsIfNotExists();
 		createTableUseCasesIfNotExists();
+		createTableLinesIfNotExists();
 	}
 	
 	private void findDriver(){
@@ -117,7 +119,44 @@ public class DatabaseOperator {
     	}
     }
     
-    public String getProjectName(int id){
+    private void createTableLinesIfNotExists(){
+    	try {
+			stmt = c.createStatement();
+			String sql = "CREATE TABLE IF NOT EXISTS lines" + 
+					"		  (id serial PRIMARY KEY NOT NULL," +
+					"		  line text NOT NULL," +
+					"		  useCaseId INTEGER NOT NULL, " +
+					"		  position INTEGER NOT NULL, " +
+					" CONSTRAINT lines_fkey FOREIGN KEY (useCaseId) REFERENCES projects(id))";
+			stmt.executeUpdate(sql);
+			System.out.println("Table created successfully");
+			stmt.close();
+			System.out.println("Opened database successfully closed");
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    }
+    
+    public Vector<String> getLines(String useCaseId)
+    {
+    	Vector<String> resultVector = new Vector<String>();
+    	try {
+			stmt = c.createStatement();
+			
+			String sql = "SELECT name FROM Projects";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				resultVector.insertElementAt(result.getString("line"), Integer.parseInt(result.getString("position"))); 
+			}
+			System.out.println("Opened database successfully closed");
+			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return resultVector;
+    }
+    
+    public String getProjectName(String id){
     	String name = "";
     	try {
 			stmt = c.createStatement();
@@ -331,6 +370,22 @@ public class DatabaseOperator {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
     	return project_id;
+	}
+
+	public String getUseCaseIdFromName(String name) {
+    	String use_case_id = new String();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT id FROM use_cases WHERE name = '" + name + "'";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				use_case_id = String.valueOf(result.getInt("id"));
+			}
+			stmt.close();
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return use_case_id;
 	}
     
 }

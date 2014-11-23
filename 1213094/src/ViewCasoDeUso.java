@@ -1,7 +1,9 @@
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -9,11 +11,11 @@ import javax.swing.border.Border;
 
 public class ViewCasoDeUso extends JPanel{
 
-	public static int MODEL_PRIMARY = 0xFF;
-	public static int MODEL_SECONDARY = 0xFE;
 	private static int NUMBER_OF_START_TEXT_FIELDS = 3;
 	private static Border BORDER = BorderFactory.createEmptyBorder(3,3,3,3);
 	
+	private String id;
+	private String project_id;
 	private JTextField nome; 
 	private JTextField 	objetivo;
 	private JTextField 	nivel;
@@ -22,19 +24,17 @@ public class ViewCasoDeUso extends JPanel{
 	private JTextField 	ator_de_suporte; 
 	private JTextField 	pre_condicoes;
 	private JTextField 	pos_condicoes;
-	private ArrayList<JTextField>	pontos_de_extensao_list;
-	private ArrayList<JTextField>	fluxo_principal_list;
-	private ArrayList<JTextField>	extensoes_list;
+	private ArrayList<JTextField> pontos_de_extensao_list;
+	private ArrayList<JTextField> fluxo_principal_list;
+	private ArrayList<JTextField> extensoes_list;
 	
-	public ViewCasoDeUso(int model){
-		super();
-		if (model == MODEL_PRIMARY){
-			this.trigger = null;
-		}
-		else{
-			this.trigger = new JTextField(50);
-		}
-		
+	private JComboBox<String> actors;
+	private JComboBox<String> use_cases;
+	private Vector<String> use_case_list;
+	private Vector<String> actors_list;
+	
+	public ViewCasoDeUso(String id, String project_id){		
+		this.id = id;
 		this.nome = new JTextField(50);
 		this.objetivo = new JTextField(50);
 		this.nivel = new JTextField(50);
@@ -42,6 +42,12 @@ public class ViewCasoDeUso extends JPanel{
 		this.ator_de_suporte = new JTextField(50);
 		this.pre_condicoes = new JTextField(50);
 		this.pos_condicoes = new JTextField(50);
+		
+		use_case_list = DatabaseOperator.getInstance().listUseCases(project_id);
+		use_cases = new JComboBox<String>(use_case_list);
+		
+		actors_list = DatabaseOperator.getInstance().listActors(project_id);
+		actors = new JComboBox<String>(actors_list);
 		
 		this.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		this.add(createMainBox());
@@ -51,6 +57,8 @@ public class ViewCasoDeUso extends JPanel{
 		Box main_box = Box.createVerticalBox();
 		
 		main_box.add(createNomeBox());
+		main_box.add(Box.createVerticalStrut(1));
+		main_box.add(createExtensionBox());
 		main_box.add(Box.createVerticalStrut(1));
 		main_box.add(createObjetivoBox());
 		main_box.add(Box.createVerticalStrut(1));
@@ -84,6 +92,14 @@ public class ViewCasoDeUso extends JPanel{
 		nome_box.add(this.nome);
 		nome_box.setBorder(ViewCasoDeUso.BORDER);
 		return nome_box;
+	}
+	
+	public Box createExtensionBox(){
+		Box extension_box = Box.createHorizontalBox();
+		extension_box.add(new JLabel("Extends: "));
+		extension_box.add(this.use_cases);
+		extension_box.setBorder(ViewCasoDeUso.BORDER);
+		return extension_box;
 	}
 	
 	public Box createPreCondicoesBox(){
@@ -146,12 +162,17 @@ public class ViewCasoDeUso extends JPanel{
 	}
 	
 	public Box createFluxoPrincipalBox(){
+		Vector<String> lineList = DatabaseOperator.getInstance().getLines(this.id); 
 		Box fluxo_principal_box = Box.createHorizontalBox();
 		JLabel label = new JLabel("Fluxo Principal: ");
 		fluxo_principal_box.add(label);
 		this.fluxo_principal_list = new ArrayList<JTextField>();
 		fluxo_principal_box.add(createFluxoPrincipalInBox());
 		fluxo_principal_box.setBorder(ViewCasoDeUso.BORDER);
+				
+		for(int i = 0; i < lineList.size(); i = i + 1) {
+			this.fluxo_principal_list.add(new JTextField(lineList.get(i)));
+		}
 		
 		return fluxo_principal_box;
 	}

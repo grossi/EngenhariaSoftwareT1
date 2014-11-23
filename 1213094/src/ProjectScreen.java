@@ -73,7 +73,7 @@ public class ProjectScreen extends JPanel {
 		load.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Main.changeScreen(new ViewCasoDeUso(0));
+				Main.changeScreen(new ViewCasoDeUso(DatabaseOperator.getInstance().getUseCaseIdFromName(use_cases.getItemAt(use_cases.getSelectedIndex())), project_id));
 			}
 		});
 		

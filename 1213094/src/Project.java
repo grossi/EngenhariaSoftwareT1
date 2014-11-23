@@ -7,7 +7,7 @@ public class Project extends JPanel{
 	
 	private ArrayList<ViewCasoDeUso> useCases = new ArrayList<ViewCasoDeUso>();
 	
-	public Project(int id){
+	public Project(String id){
 		super();
 		DatabaseOperator.getInstance().getProjectName(id);
 	}
