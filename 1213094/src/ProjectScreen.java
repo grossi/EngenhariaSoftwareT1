@@ -70,6 +70,13 @@ public class ProjectScreen extends JPanel {
 			}
 		});
 		
+		load.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Main.changeScreen(new ViewCasoDeUso(0));
+			}
+		});
+		
 		this.add(createMainBox());
 	}
 	

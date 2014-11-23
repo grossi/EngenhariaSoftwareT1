@@ -43,8 +43,6 @@ public class InitialScreen extends JPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//Aqui deveria ser o ID, nao o nome
-				//TODO: Database.GetIdFromName()
 				Main.changeScreen(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName(projects.getItemAt(projects.getSelectedIndex()))));
 			}
 		});
