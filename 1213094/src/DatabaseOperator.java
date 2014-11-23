@@ -136,25 +136,7 @@ public class DatabaseOperator {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
     }
-    
-    public Vector<String> getLines(String useCaseId)
-    {
-    	Vector<String> resultVector = new Vector<String>();
-    	try {
-			stmt = c.createStatement();
-			
-			String sql = "SELECT name FROM Projects";
-			ResultSet result = stmt.executeQuery(sql);
-			while (result.next()){
-				resultVector.insertElementAt(result.getString("line"), Integer.parseInt(result.getString("position"))); 
-			}
-			System.out.println("Opened database successfully closed");
-			
-    	} catch ( Exception e ) {
-    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
-    	}
-    	return resultVector;
-    }
+
     
     public String getProjectName(String id){
     	String name = "";
@@ -306,6 +288,29 @@ public class DatabaseOperator {
 		return false;
     }
     
+
+	private boolean ifLineExists(String line, String id) {
+    	try {
+    		stmt = c.createStatement();
+  			String sql = "SELECT id " +
+		           	 "FROM lines "+
+		           	 "WHERE line = '" + line + "' AND " +
+		           	 "useCaseId = " + id + ";";
+  			ResultSet result = stmt.executeQuery(sql);
+  			while (result.next()){
+  				System.out.println("Line already exists!");
+  				return true;
+  			}
+  			System.out.println("Line not exists!");
+  			stmt.close();
+  			return false;
+      	} catch ( Exception e ) {
+      		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+      		System.exit(0);
+      	}
+		return false;
+	}
+    
     public Vector<String> listProjects(){
     	Vector<String> project_list = new Vector<String>();
     	try {
@@ -355,6 +360,25 @@ public class DatabaseOperator {
     	}
     	return actors_list;
     }
+    
+    public Vector<String> listLines(String useCaseId)
+    {
+    	Vector<String> resultVector = new Vector<String>();
+    	try {
+			stmt = c.createStatement();
+			
+			String sql = "SELECT * FROM lines";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				resultVector.insertElementAt(result.getString("line"), Integer.parseInt(result.getString("position"))); 
+			}
+			System.out.println("Opened database successfully closed");
+			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return resultVector;
+    }
 
 	public String getProjectIdFromName(String name) {
     	String project_id = new String();
@@ -386,6 +410,49 @@ public class DatabaseOperator {
     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
     	}
     	return use_case_id;
+	}
+
+	public UseCase loadUseCase(String id) {
+    	UseCase use_case = new UseCase();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT * FROM use_cases WHERE id = '" + id + "'";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				use_case.name = String.valueOf(result.getString("name"));
+				use_case.project_id = String.valueOf(result.getString("projectid"));
+			}
+			stmt.close();
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return use_case;
+	}
+
+	public boolean addLines(Vector<String> lines, String id) {
+		for(int i = 0; i < lines.size(); i++) {
+			if(!addLine(lines.elementAt(i), id, i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean addLine(String line, String id, int position) {
+	    	try { 			
+	 			if(!ifLineExists(line, id)){
+	 				stmt = c.createStatement();
+	 	 			String sql = "INSERT INTO lines (line, useCaseId, position)" +
+	 	 			           	 " VALUES ( '" + line + "'," + id + "," + position + ")"; // storage date in milliseconds
+	 	 			stmt.executeUpdate(sql);
+	 	 			System.out.println("Use_case inserted successfully!");
+	 	 			stmt.close();
+	 			}
+	 			return true;
+	     	} catch ( Exception e ) {
+	     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+	     	}
+			return false;
 	}
     
 }
