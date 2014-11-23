@@ -39,7 +39,7 @@ public class DatabaseOperator {
 		createTableProjectsIfNotExists();
 		createTableActorsIfNotExists();
 		createTableUseCasesIfNotExists();
-		createTableLinesIfNotExists();
+		createTableStepsIfNotExists();
 	}
 	
 	private void findDriver(){
@@ -119,12 +119,12 @@ public class DatabaseOperator {
     	}
     }
     
-    private void createTableLinesIfNotExists(){
+    private void createTableStepsIfNotExists(){
     	try {
 			stmt = c.createStatement();
-			String sql = "CREATE TABLE IF NOT EXISTS lines" + 
+			String sql = "CREATE TABLE IF NOT EXISTS steps" + 
 					"		  (id serial PRIMARY KEY NOT NULL," +
-					"		  line text NOT NULL," +
+					"		  step text NOT NULL," +
 					"		  useCaseId INTEGER NOT NULL, " +
 					"		  position INTEGER NOT NULL, " +
 					" CONSTRAINT lines_fkey FOREIGN KEY (useCaseId) REFERENCES use_cases(id))";

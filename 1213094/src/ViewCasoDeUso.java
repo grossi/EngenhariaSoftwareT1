@@ -22,9 +22,8 @@ public class ViewCasoDeUso extends JPanel{
 	
 	private JButton add_extends;
 	
-	
-	private JButton add_line;
-	private JTextField 	new_line;
+	private JButton add_step;
+	private JTextField 	new_step;
 	
 	private JLabel nome;
 	 
@@ -35,13 +34,14 @@ public class ViewCasoDeUso extends JPanel{
 	private JTextField 	ator_de_suporte; 
 	private JTextField 	pre_condicoes;
 	private JTextField 	pos_condicoes;
-	private ArrayList<JTextField> pontos_de_extensao_list;
-	private ArrayList<JTextField> extensoes_list;
+	private Vector<JTextField> pontos_de_extensao_list;
+	private Vector<JTextField> extensoes_list;
+	private Vector<Observer> observers_list;
 	
 	
-	private JComboBox<String> lines;
-	private JComboBox<String> actors;
-	private JComboBox<String> use_cases;
+	private MyComboBox lines;
+	private MyComboBox actors;
+	private MyComboBox use_cases;
 	private Vector<String> use_case_list;
 	private Vector<String> actors_list;
 	
@@ -51,10 +51,11 @@ public class ViewCasoDeUso extends JPanel{
 		
 		this.nome = new JLabel(use_case.name);
 		
-		this.lines = new JComboBox<String>(use_case.lines);
+		this.lines = new MyComboBox(use_case.lines);
+		this.observers_list = new Vector<Observer>();
 		
-		this.new_line = new JTextField(50);
-		this.add_line = new JButton("Add");
+		this.new_step = new JTextField(50);
+		this.add_step = new JButton("Add");
 		
 		this.objetivo = new JTextField(50);
 		this.nivel = new JTextField(50);
@@ -64,10 +65,12 @@ public class ViewCasoDeUso extends JPanel{
 		this.pos_condicoes = new JTextField(50);
 		
 		use_case_list = DatabaseOperator.getInstance().listUseCases(use_case.project_id);
-		use_cases = new JComboBox<String>(use_case_list);
+		use_cases = new MyComboBox(use_case_list);
+		observers_list.add(use_cases);
 		
 		actors_list = DatabaseOperator.getInstance().listActors(use_case.project_id);
-		actors = new JComboBox<String>(actors_list);
+		actors = new MyComboBox(actors_list);
+		observers_list.add(actors);
 		
 		this.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		this.add(createMainBox());
@@ -109,23 +112,23 @@ public class ViewCasoDeUso extends JPanel{
 	}
 
 	private Component createAddLineBox() {
-		Box add_line_box = Box.createHorizontalBox();
-		add_line_box.add(new JLabel("New Step: "));
-		add_line_box.add(this.new_line);
-		add_line_box.add(this.add_line);
-		add_line_box.setBorder(ViewCasoDeUso.BORDER);
-		add_line.addActionListener(new ActionListener() {
+		Box add_step_box = Box.createHorizontalBox();
+		add_step_box.add(new JLabel("New Step: "));
+		add_step_box.add(this.new_step);
+		add_step_box.add(this.add_step);
+		add_step_box.setBorder(ViewCasoDeUso.BORDER);
+		add_step.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(!use_case.lines.contains(new_line.getText())) {
-					use_case.lines.add( new_line.getText() ); 
-					DatabaseOperator.getInstance().addLine(new_line.getText(), use_case.id, use_case.lines.size()-1);
+				if(!use_case.lines.contains(new_step.getText())) {
+					use_case.lines.add( new_step.getText() ); 
+					DatabaseOperator.getInstance().addLine(new_step.getText(), use_case.id, use_case.lines.size()-1);
+					updateObservers();
 				}
 			}
 		});
 		
-		
-		return add_line_box;
+		return add_step_box;
 	}
 
 	public Box createNomeBox(){
@@ -147,7 +150,8 @@ public class ViewCasoDeUso extends JPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				use_case.extends_id.add( DatabaseOperator.getInstance().getUseCaseIdFromName(use_cases.getItemAt(use_cases.getSelectedIndex()))); 
+				use_case.extends_id.add( DatabaseOperator.getInstance().getUseCaseIdFromName(use_cases.getItemAt(use_cases.getSelectedIndex())));
+				updateObservers(); 
 			}
 		});
 		
@@ -206,7 +210,7 @@ public class ViewCasoDeUso extends JPanel{
 		Box pontos_de_extensao_box = Box.createHorizontalBox();
 		JLabel label = new JLabel("Pontos de extensão: ");
 		pontos_de_extensao_box.add(label);
-		this.pontos_de_extensao_list = new ArrayList<JTextField>();
+		this.pontos_de_extensao_list = new Vector<JTextField>();
 		pontos_de_extensao_box.add(createPontosDeExtensaoInBox());
 		pontos_de_extensao_box.setBorder(ViewCasoDeUso.BORDER);
 		
@@ -226,7 +230,7 @@ public class ViewCasoDeUso extends JPanel{
 		Box extensoes_box = Box.createHorizontalBox();
 		JLabel label = new JLabel("Extensões: ");
 		extensoes_box.add(label);
-		this.extensoes_list = new ArrayList<JTextField>();
+		this.extensoes_list = new Vector<JTextField>();
 		extensoes_box.add(createExtensoesInBox());
 		extensoes_box.setBorder(ViewCasoDeUso.BORDER);
 		return extensoes_box;
@@ -260,5 +264,11 @@ public class ViewCasoDeUso extends JPanel{
 		trigger_box.add(this.trigger);
 		trigger_box.setBorder(ViewCasoDeUso.BORDER);
 		return trigger_box;
+	}
+	
+	private void updateObservers(){
+		for(Observer current:observers_list){
+			current.updateUI();
+		}
 	}
 }

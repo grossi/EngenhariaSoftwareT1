@@ -16,7 +16,7 @@ public class InitialScreen extends JPanel{
 	private JButton create;
 	private JButton load;
 	
-	private JComboBox<String> projects;
+	private MyComboBox projects;
 	private JTextField new_project_name;
 	
 	public InitialScreen(){
@@ -27,7 +27,7 @@ public class InitialScreen extends JPanel{
 		
 		load = new JButton("Load");
 		Vector<String> projects_list = DatabaseOperator.getInstance().listProjects();
-		projects = new JComboBox<String>(projects_list);
+		projects = new MyComboBox(projects_list);
 		
 		create.addActionListener(new ActionListener() {
 			
