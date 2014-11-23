@@ -127,7 +127,7 @@ public class DatabaseOperator {
 					"		  line text NOT NULL," +
 					"		  useCaseId INTEGER NOT NULL, " +
 					"		  position INTEGER NOT NULL, " +
-					" CONSTRAINT lines_fkey FOREIGN KEY (useCaseId) REFERENCES projects(id))";
+					" CONSTRAINT lines_fkey FOREIGN KEY (useCaseId) REFERENCES use_cases(id))";
 			stmt.executeUpdate(sql);
 			System.out.println("Table created successfully");
 			stmt.close();
@@ -143,7 +143,7 @@ public class DatabaseOperator {
     	try {
 			stmt = c.createStatement();
 			
-			String sql = "SELECT name FROM Projects";
+			String sql = "SELECT name FROM Projects WHERE id = " + id;
 			ResultSet result = stmt.executeQuery(sql);
 			while (result.next()){
 				name = result.getString("name");

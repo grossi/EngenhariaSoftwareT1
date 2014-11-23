@@ -34,7 +34,7 @@ public class InitialScreen extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (DatabaseOperator.getInstance().insertProject(new_project_name.getText())) {
-					Main.changeScreen(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName(new_project_name.getText())));			
+					GUI.getInstance().changeScreen(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName(new_project_name.getText())), GUI.PROJECT_LEVEL);			
 				}
 			}
 		});
@@ -43,7 +43,7 @@ public class InitialScreen extends JPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Main.changeScreen(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName(projects.getItemAt(projects.getSelectedIndex()))));
+				GUI.getInstance().changeScreen(new ProjectScreen(DatabaseOperator.getInstance().getProjectIdFromName(projects.getItemAt(projects.getSelectedIndex()))), GUI.PROJECT_LEVEL);
 			}
 		});
 		
