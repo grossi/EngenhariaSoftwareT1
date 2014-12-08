@@ -1,4 +1,3 @@
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
@@ -52,7 +51,6 @@ public class GUI {
 	public void changeScreen(JPanel frame, int level){
         if (list_screens.size() > level){
             list_screens.remove(level);
-            
             if (list_screens.size() > level){
                 list_screens.remove(level);
             }
@@ -67,15 +65,11 @@ public class GUI {
         Box main_box = Box.createVerticalBox();
         Box buttons_box = Box.createHorizontalBox();
         
-//        Object copy = ;
-        JPanel copy = new JPanel();
-        copy.add(list_screens.get(current_level));
-        
-        main_box.add(copy);
+        main_box.add(list_screens.get(current_level));
         buttons_box.add(back);
         buttons_box.add(forward);
         main_box.add(buttons_box);
-
+        
 		mainFrame.getContentPane().removeAll();
         mainFrame.getContentPane().add(main_box);
         mainFrame.getContentPane().revalidate();

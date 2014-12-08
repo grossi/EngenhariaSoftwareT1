@@ -19,9 +19,8 @@ public class ProjectScreen extends JPanel {
 	private JButton create_use_case;
 	private JButton load;
 	
-	private MyComboBox actors;
-	private MyComboBox use_cases;
-	private Vector<Observer> observers_list;
+	private JComboBox<String> actors;
+	private JComboBox<String> use_cases;
 	private JTextField new_actor_name;
 	private JTextField new_use_case_name;
 	
@@ -35,7 +34,6 @@ public class ProjectScreen extends JPanel {
 		
 		new_actor_name = new JTextField(20);
 		new_use_case_name = new JTextField(20);
-		observers_list = new Vector<Observer>();
 		
 		create_actor = new JButton("Create Actor");
 		create_use_case = new JButton("Create Use Case");
@@ -43,12 +41,10 @@ public class ProjectScreen extends JPanel {
 		load = new JButton("Load");
 		
 		use_case_list = DatabaseOperator.getInstance().listUseCases(id);
-		use_cases = new MyComboBox(use_case_list);
-		observers_list.addElement(use_cases);
+		use_cases = new JComboBox<String>(use_case_list);
 		
 		actors_list = DatabaseOperator.getInstance().listActors(id);
-		actors = new MyComboBox(actors_list);
-		observers_list.addElement(actors);
+		actors = new JComboBox<String>(actors_list);
 		
 		create_use_case.addActionListener(new ActionListener() {
 			
@@ -57,7 +53,6 @@ public class ProjectScreen extends JPanel {
 				if (new_actor_name.getText() != ""){
 					if(DatabaseOperator.getInstance().insertUseCase(new_use_case_name.getText(), project_id)){
 						use_case_list.add(new_use_case_name.getText());
-						updateObservers();						
 					}
 				}
 			}
@@ -70,7 +65,6 @@ public class ProjectScreen extends JPanel {
 				if (new_actor_name.getText() != ""){
 					if(DatabaseOperator.getInstance().insertActor(new_actor_name.getText(), project_id)){
 						actors_list.add(new_actor_name.getText());
-						updateObservers(); 
 					}
 				}
 			}
@@ -115,11 +109,5 @@ public class ProjectScreen extends JPanel {
 		main_box.add(create_box);
 		
 		return main_box;
-	}
-	
-	private void updateObservers(){
-		for(Observer current:observers_list){
-			current.updateUI();
-		}
 	}
 }

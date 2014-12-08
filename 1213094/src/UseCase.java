@@ -7,7 +7,6 @@ public class UseCase {
 	public String project_id;
 	public String name;
 	public Vector<String> extends_id;
-	public Vector<String> includs_id;
 	public Vector<String> lines;
 
 	public UseCase() {};
@@ -18,7 +17,6 @@ public class UseCase {
 		this.name = use_case_temp.name;
 		this.project_id = use_case_temp.project_id;
 		this.extends_id = new Vector<String>();
-		this.includs_id = new Vector<String>();
 		this.lines = DatabaseOperator.getInstance().listLines(id);
 	}
 

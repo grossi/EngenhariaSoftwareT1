@@ -11,19 +11,12 @@ public class MyComboBox extends JComboBox<String> implements Observer {
 		this.data = new Vector<String>();
 	}
 	
-	public MyComboBox(Vector<String> lines){
-		super();
-		this.data = lines;
-	}
-	
 	@Override
 	public void updateUI(){
 		this.removeAllItems(); 
-		if(this.data != null){
-			for(String str : this.data){
-				this.addItem(new String(str)); // se str nao for um novo objeto, ao remover todos os itens, eles serao 
-												// excluidos da Vector data.
-			}	
+		for(String str : this.data){
+			this.addItem(new String(str)); // se str nao for um novo objeto, ao remover todos os itens, eles serao 
+											// excluidos da Vector data.
 		}
 	}
 	
