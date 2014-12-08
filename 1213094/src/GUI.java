@@ -49,11 +49,8 @@ public class GUI {
 	}
 	
 	public void changeScreen(JPanel frame, int level){
-        if (list_screens.size() > level){
+        while (list_screens.size() > level){
             list_screens.remove(level);
-            if (list_screens.size() > level){
-                list_screens.remove(level);
-            }
         }
         
         list_screens.add(level, frame);

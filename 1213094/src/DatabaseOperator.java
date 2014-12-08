@@ -454,5 +454,20 @@ public class DatabaseOperator {
 	     	}
 			return false;
 	}
+
+	public void deleteUseCase(String id) {
+		try {
+ 				stmt = c.createStatement();
+ 	 			String sql = "DELETE FROM use_cases" +
+ 	 			           	 " WHERE id = " + id;
+ 	 			stmt.executeUpdate(sql);
+ 	 			System.out.println("Use_case deleted successfully!");
+ 	 			stmt.close();
+ 			
+ 			
+     	} catch ( Exception e ) {
+     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+     	}
+	}
     
 }

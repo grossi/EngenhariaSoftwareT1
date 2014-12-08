@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -18,6 +19,7 @@ public class ProjectScreen extends JPanel {
 	private JButton create_actor;
 	private JButton create_use_case;
 	private JButton load;
+	private JButton delete;
 	
 	private JComboBox<String> actors;
 	private JComboBox<String> use_cases;
@@ -39,6 +41,8 @@ public class ProjectScreen extends JPanel {
 		create_use_case = new JButton("Create Use Case");
 		
 		load = new JButton("Load");
+		
+		delete = new JButton("Delete");
 		
 		use_case_list = DatabaseOperator.getInstance().listUseCases(id);
 		use_cases = new JComboBox<String>(use_case_list);
@@ -77,6 +81,16 @@ public class ProjectScreen extends JPanel {
 			}
 		});
 		
+		delete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DatabaseOperator dbInstance = DatabaseOperator.getInstance();
+				dbInstance.deleteUseCase(dbInstance.getUseCaseIdFromName((String)use_cases.getSelectedItem()));
+				use_case_list.remove(use_cases.getSelectedItem());
+				use_cases.setSelectedIndex(0);
+			}
+		});
+		
 		this.add(createMainBox());
 	}
 	
@@ -89,6 +103,8 @@ public class ProjectScreen extends JPanel {
 		load_box.add(use_cases);
 		load_box.add(Box.createVerticalStrut(1));
 		load_box.add(load);
+		load_box.add(Box.createVerticalStrut(1));
+		load_box.add(delete);
 		load_box.add(Box.createVerticalStrut(1));
 		
 
