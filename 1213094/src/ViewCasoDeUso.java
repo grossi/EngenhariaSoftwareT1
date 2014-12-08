@@ -37,9 +37,10 @@ public class ViewCasoDeUso extends JPanel{
 	private JTextField 	pos_condicoes;
 	private ArrayList<JTextField> pontos_de_extensao_list;
 	private ArrayList<JTextField> extensoes_list;
-	
-	
-	private JComboBox<String> lines;
+
+	private Vector<JButton> line_buttons_delete;
+	private Vector<JButton> line_buttons_up;
+	private Vector<JButton> line_buttons_down;
 	private JComboBox<String> actors;
 	private JComboBox<String> use_cases;
 	private Vector<String> use_case_list;
@@ -51,8 +52,14 @@ public class ViewCasoDeUso extends JPanel{
 		
 		this.nome = new JLabel(use_case.name);
 		
-		this.lines = new JComboBox<String>(use_case.lines);
-		
+		this.line_buttons_delete = new Vector<JButton>();
+		this.line_buttons_up = new Vector<JButton>();
+		this.line_buttons_down = new Vector<JButton>();
+		for(int i = 0; i < use_case.lines.size(); i++) {
+			line_buttons_down.add(i, new JButton("\\/"));
+			line_buttons_up.add(i, new JButton("/\\"));
+			line_buttons_delete.add(i, new JButton("<>"));
+		}
 		this.new_line = new JTextField(50);
 		this.add_line = new JButton("Add");
 		
@@ -71,6 +78,10 @@ public class ViewCasoDeUso extends JPanel{
 		
 		this.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		this.add(createMainBox());
+	}
+	
+	public void updateScreen() {
+		GUI.getInstance().changeScreen(new ViewCasoDeUso(use_case.id), GUI.USE_CASE_LEVEL);
 	}
 	
 	public Box createMainBox(){
@@ -118,8 +129,10 @@ public class ViewCasoDeUso extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(!use_case.lines.contains(new_line.getText())) {
-					use_case.lines.add( new_line.getText() ); 
-					DatabaseOperator.getInstance().addLine(new_line.getText(), use_case.id, use_case.lines.size()-1);
+					Line tempLine = DatabaseOperator.getInstance().addLine(new_line.getText(), use_case.id, use_case.lines.size());
+					System.out.println(use_case.lines.size());
+					use_case.lines.add( tempLine ); 
+					updateScreen();
 				}
 			}
 		});
@@ -214,10 +227,59 @@ public class ViewCasoDeUso extends JPanel{
 	}
 	
 	public Box createFluxoPrincipalBox(){
-		Box fluxo_principal_box = Box.createHorizontalBox();
-		JLabel label = new JLabel("Fluxo Principal: ");
+		Box fluxo_principal_box = Box.createVerticalBox();
+		JLabel label = new JLabel("Fluxo Principal");
 		fluxo_principal_box.add(label);
-		fluxo_principal_box.add(lines);
+		for(int i = 0; i < use_case.lines.size(); i++)
+		{
+			Box tempBox = Box.createHorizontalBox();
+			tempBox.add(new JTextField(use_case.lines.get(i).text));
+			tempBox.add(line_buttons_delete.get(i));
+			tempBox.add(line_buttons_up.get(i));
+			tempBox.add(line_buttons_down.get(i));
+			final Line l = use_case.lines.get(i);
+			line_buttons_delete.get(i).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DatabaseOperator.getInstance().deleteLine(l.id);
+				updateScreen();
+			}
+			});
+			line_buttons_up.get(i).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(l.pos>0) {
+					DatabaseOperator db = DatabaseOperator.getInstance();
+					Line temp = use_case.lines.get(l.pos-1);
+					db.deleteLine(l.id);
+					db.deleteLine(temp.id);
+					temp.pos++;
+					l.pos--;
+					db.addLine(l.text, use_case.id, l.pos);
+					db.addLine(temp.text, use_case.id, temp.pos);
+					updateScreen();
+				}
+			}
+			});
+			line_buttons_down.get(i).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(use_case.lines.size() > l.pos+1) {
+					DatabaseOperator db = DatabaseOperator.getInstance();
+					Line temp = use_case.lines.get(l.pos+1);
+					db.deleteLine(l.id);
+					db.deleteLine(temp.id);
+					temp.pos--;
+					l.pos++;
+					db.addLine(l.text, use_case.id, l.pos);
+					db.addLine(temp.text, use_case.id, temp.pos);
+					updateScreen();
+				}
+			}
+			});
+			fluxo_principal_box.add(tempBox);
+			
+		}
 		fluxo_principal_box.setBorder(ViewCasoDeUso.BORDER);
 		return fluxo_principal_box;
 	}

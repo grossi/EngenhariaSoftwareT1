@@ -7,7 +7,7 @@ public class UseCase {
 	public String project_id;
 	public String name;
 	public Vector<String> extends_id;
-	public Vector<String> lines;
+	public Vector<Line> lines;
 
 	public UseCase() {};
 	

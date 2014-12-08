@@ -361,16 +361,22 @@ public class DatabaseOperator {
     	return actors_list;
     }
     
-    public Vector<String> listLines(String useCaseId)
+    public Vector<Line> listLines(String useCaseId)
     {
-    	Vector<String> resultVector = new Vector<String>();
+    	Vector<Line> resultVector = new Vector<Line>();
     	try {
 			stmt = c.createStatement();
 			
-			String sql = "SELECT * FROM lines";
+			String sql = "SELECT * FROM lines WHERE usecaseid = " + useCaseId;
 			ResultSet result = stmt.executeQuery(sql);
+			int max = 0;
 			while (result.next()){
-				resultVector.insertElementAt(result.getString("line"), Integer.parseInt(result.getString("position"))); 
+				int pos = Integer.parseInt(result.getString("position"));
+				Line tempLine = new Line();
+				tempLine.id = result.getString("id");
+				tempLine.pos = Integer.parseInt(result.getString("position"));
+				tempLine.text = result.getString("line");
+				resultVector.insertElementAt(tempLine, tempLine.pos); 
 			}
 			System.out.println("Opened database successfully closed");
 			
@@ -428,31 +434,29 @@ public class DatabaseOperator {
     	}
     	return use_case;
 	}
-
-	public boolean addLines(Vector<String> lines, String id) {
-		for(int i = 0; i < lines.size(); i++) {
-			if(!addLine(lines.elementAt(i), id, i)) {
-				return false;
-			}
-		}
-		return true;
-	}
 	
-	public boolean addLine(String line, String id, int position) {
-	    	try { 			
-	 			if(!ifLineExists(line, id)){
-	 				stmt = c.createStatement();
-	 	 			String sql = "INSERT INTO lines (line, useCaseId, position)" +
-	 	 			           	 " VALUES ( '" + line + "'," + id + "," + position + ")"; // storage date in milliseconds
-	 	 			stmt.executeUpdate(sql);
-	 	 			System.out.println("Use_case inserted successfully!");
-	 	 			stmt.close();
-	 			}
-	 			return true;
-	     	} catch ( Exception e ) {
-	     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
-	     	}
-			return false;
+	public Line addLine(String line, String id, int position) {
+		try { 				
+			stmt = c.createStatement();
+ 			String sql = "INSERT INTO lines (line, useCaseId, position)" +
+ 			           	 " VALUES ( '" + line + "'," + id + "," + position + ")" +
+ 			           	 "RETURNING id";
+ 			ResultSet result = stmt.executeQuery(sql);
+ 			if(!result.next()) {
+ 				stmt.close();
+ 				return null;
+ 			}
+ 			System.out.println("Line inserted successfully!");
+ 			Line tempLine = new Line();
+ 			tempLine.id = result.getString("id");
+ 			tempLine.text = line;
+ 			tempLine.pos = position;
+ 			stmt.close();
+ 			return tempLine;
+     	} catch ( Exception e ) {
+     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+     	}
+		return null;
 	}
 
 	public void deleteUseCase(String id) {
@@ -468,6 +472,20 @@ public class DatabaseOperator {
      	} catch ( Exception e ) {
      		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
      	}
+	}
+
+	public void deleteLine(String id) {
+		try {
+				stmt = c.createStatement();
+	 			String sql = "DELETE FROM lines" +
+	 			           	 " WHERE id = " + id;
+	 			stmt.executeUpdate(sql);
+	 			System.out.println("Line deleted successfully!");
+	 			stmt.close();
+			
+	 	} catch ( Exception e ) {
+	 		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+	 	}		
 	}
     
 }
