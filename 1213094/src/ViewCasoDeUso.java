@@ -23,7 +23,6 @@ public class ViewCasoDeUso extends JPanel{
 	private JButton add_extends;
 	private JButton add_include;
 	
-	
 	private JButton add_line;
 	private JTextField 	new_line;
 	
@@ -32,8 +31,8 @@ public class ViewCasoDeUso extends JPanel{
 	private JTextField 	objetivo;
 	private JTextField 	nivel;
 	private JTextField trigger;	
-	private JTextField 	ator_primario; 
-	private JTextField 	ator_de_suporte; 
+	private JComboBox<String> 	ator_primario;
+	private JComboBox<String> 	ator_de_suporte;
 	private JTextField 	pre_condicoes;
 	private JTextField 	pos_condicoes;
 	private ArrayList<JTextField> pontos_de_extensao_list;
@@ -66,6 +65,7 @@ public class ViewCasoDeUso extends JPanel{
 		this.lines_list = new Vector<String>();
 		this.include_buttons_delete = new Vector<JButton>(); 
 		this.extendes_buttons_delete = new Vector<JButton>(); 
+		
 		for(int i = 0; i < use_case.lines.size(); i++) {
 			line_buttons_down.add(i, new JButton("\\/"));
 			line_buttons_up.add(i, new JButton("/\\"));
@@ -79,13 +79,14 @@ public class ViewCasoDeUso extends JPanel{
 		for(int i = 0; i < use_case.extendes.size(); i++) {
 			extendes_buttons_delete.add(i, new JButton("Del"));
 		}
+		
 		this.new_line = new JTextField(50);
 		this.add_line = new JButton("Add");
 		
 		this.objetivo = new JTextField(50);
 		this.nivel = new JTextField(50);
-		this.ator_primario = new JTextField(50);
-		this.ator_de_suporte = new JTextField(50);
+		this.ator_primario = new JComboBox();
+		this.ator_de_suporte = new JComboBox();
 		this.pre_condicoes = new JTextField(50);
 		this.pos_condicoes = new JTextField(50);
 		
@@ -232,6 +233,11 @@ public class ViewCasoDeUso extends JPanel{
 	public Box createAtorPrimarioBox(){
 		Box ator_primario_box = Box.createHorizontalBox();
 		ator_primario_box.add(new JLabel("Ator Primário: "));
+		Vector<String> actors = DatabaseOperator.getInstance().getActorsName();
+		this.ator_primario.addItem(new String());
+		for(String actor: actors){
+			this.ator_primario.addItem(actor);
+		}
 		ator_primario_box.add(this.ator_primario);
 		ator_primario_box.setBorder(ViewCasoDeUso.BORDER);
 		return ator_primario_box;
@@ -240,6 +246,11 @@ public class ViewCasoDeUso extends JPanel{
 	public Box createAtorDeSuporteBox(){
 		Box ator_de_suporte_box = Box.createHorizontalBox();
 		ator_de_suporte_box.add(new JLabel("Ator de Suporte: "));
+		Vector<String> actors = DatabaseOperator.getInstance().getActorsName();
+		this.ator_de_suporte.addItem(new String());
+		for(String actor: actors){
+			this.ator_de_suporte.addItem(actor);
+		}
 		ator_de_suporte_box.add(this.ator_de_suporte);
 		ator_de_suporte_box.setBorder(ViewCasoDeUso.BORDER);
 		return ator_de_suporte_box;

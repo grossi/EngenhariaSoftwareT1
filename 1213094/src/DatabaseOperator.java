@@ -470,6 +470,21 @@ public class DatabaseOperator {
     	return resultVector;
     }
 
+    public Vector<String> getActorsName() {
+    	Vector<String> actors_name = new Vector<String>();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT name FROM actors";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				actors_name.add(String.valueOf(result.getString("name")));
+			}
+			stmt.close();
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return actors_name;
+	}
     
 	public String getProjectIdFromName(String name) {
     	String project_id = new String();
