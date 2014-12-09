@@ -8,6 +8,8 @@ public class UseCase {
 	public String name;
 	public Vector<String> extends_id;
 	public Vector<Line> lines;
+	public Vector<Include> includes;
+	public Vector<Extend> extendes;
 
 	public UseCase() {};
 	
@@ -18,6 +20,8 @@ public class UseCase {
 		this.project_id = use_case_temp.project_id;
 		this.extends_id = new Vector<String>();
 		this.lines = DatabaseOperator.getInstance().listLines(id);
+		this.includes = DatabaseOperator.getInstance().listIncludes(id);
+		this.extendes = DatabaseOperator.getInstance().listExtends(id);
 	}
 
 }

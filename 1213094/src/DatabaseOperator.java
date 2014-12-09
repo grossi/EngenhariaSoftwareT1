@@ -40,6 +40,8 @@ public class DatabaseOperator {
 		createTableActorsIfNotExists();
 		createTableUseCasesIfNotExists();
 		createTableLinesIfNotExists();
+		createTableExtendsIfNotExists();
+		createTableIncludesIfNotExists();
 	}
 	
 	private void findDriver(){
@@ -128,6 +130,40 @@ public class DatabaseOperator {
 					"		  useCaseId INTEGER NOT NULL, " +
 					"		  position INTEGER NOT NULL, " +
 					" CONSTRAINT lines_fkey FOREIGN KEY (useCaseId) REFERENCES use_cases(id))";
+			stmt.executeUpdate(sql);
+			System.out.println("Table created successfully");
+			stmt.close();
+			System.out.println("Opened database successfully closed");
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    }
+    
+    private void createTableExtendsIfNotExists(){
+    	try {
+			stmt = c.createStatement();
+			String sql = "CREATE TABLE IF NOT EXISTS extends" + 
+					"		  (id serial PRIMARY KEY NOT NULL," +
+					"		  useCaseId INTEGER NOT NULL REFERENCES use_cases(id), " +
+					"		  lineId INTEGER NOT NULL REFERENCES lines(id), " +
+					"		  extendedUseCaseId INTEGER NOT NULL REFERENCES use_cases(id)) ";
+			stmt.executeUpdate(sql);
+			System.out.println("Table created successfully");
+			stmt.close();
+			System.out.println("Opened database successfully closed");
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    }
+    
+    private void createTableIncludesIfNotExists(){
+    	try {
+			stmt = c.createStatement();
+			String sql = "CREATE TABLE IF NOT EXISTS includes" + 
+					"		  (id serial PRIMARY KEY NOT NULL," +
+					"		  useCaseId INTEGER NOT NULL REFERENCES use_cases(id), " +
+					"		  lineId INTEGER NOT NULL REFERENCES lines(id), " +
+					"		  includedUseCaseId INTEGER NOT NULL REFERENCES use_cases(id)) ";
 			stmt.executeUpdate(sql);
 			System.out.println("Table created successfully");
 			stmt.close();
@@ -385,7 +421,56 @@ public class DatabaseOperator {
     	}
     	return resultVector;
     }
+    
+    public Vector<Include> listIncludes(String useCaseId)
+    {
+    	Vector<Include> resultVector = new Vector<Include>();
+    	try {
+			stmt = c.createStatement();
+			
+			String sql = "SELECT * FROM includes WHERE usecaseid = " + useCaseId;
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				Include tempInclude = new Include();
+				tempInclude.id = result.getString("id");
+				tempInclude.line_id = result.getString("lineid");
+				tempInclude.use_case_id = result.getString("usecaseid");
+				tempInclude.included_use_case_id = result.getString("includedusecaseid");
+				resultVector.add(tempInclude); 
+			}
+			System.out.println("Opened database successfully closed");
+			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return resultVector;
+    }
 
+    public Vector<Extend> listExtends(String useCaseId)
+    {
+    	Vector<Extend> resultVector = new Vector<Extend>();
+    	try {
+			stmt = c.createStatement();
+			
+			String sql = "SELECT * FROM extends WHERE usecaseid = " + useCaseId;
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				Extend tempExtend = new Extend();
+				tempExtend.id = result.getString("id");
+				tempExtend.line_id = result.getString("lineid");
+				tempExtend.use_case_id = result.getString("usecaseid");
+				tempExtend.extended_use_case_id = result.getString("extendedUsecaseid");
+				resultVector.add(tempExtend); 
+			}
+			System.out.println("Opened database successfully closed");
+			
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return resultVector;
+    }
+
+    
 	public String getProjectIdFromName(String name) {
     	String project_id = new String();
     	try {
@@ -458,11 +543,39 @@ public class DatabaseOperator {
      	}
 		return null;
 	}
+	
+	public void addInclude(String useCaseId, String includedUseCaseId, Line line) {
+		try { 				
+			stmt = c.createStatement();
+ 			String sql = "INSERT INTO includes (lineId, useCaseId, includedUseCaseId)" +
+ 			           	 " VALUES ( " + line.id + "," + useCaseId + "," + includedUseCaseId + ")";
+ 			stmt.executeUpdate(sql);
+ 			stmt.close();
+     	} catch ( Exception e ) {
+     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+     	}
+	}
 
+	public void addExtend(String useCaseId, String extendedUseCaseId, Line line) {
+		try { 				
+			stmt = c.createStatement();
+ 			String sql = "INSERT INTO extends (lineId, useCaseId, extendedUseCaseId)" +
+ 			           	 " VALUES ( " + line.id + "," + useCaseId + "," + extendedUseCaseId + ")";
+ 			stmt.executeUpdate(sql);
+ 			stmt.close();
+     	} catch ( Exception e ) {
+     		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+     	}
+	}
+	
 	public void deleteUseCase(String id) {
 		try {
+				
  				stmt = c.createStatement();
- 	 			String sql = "DELETE FROM use_cases" +
+ 	 			String sql = "DELETE FROM lines" +
+ 	 			           	 " WHERE usecaseid = " + id;
+ 	 			stmt.executeUpdate(sql);
+ 	 			sql = "DELETE FROM use_cases" +
  	 			           	 " WHERE id = " + id;
  	 			stmt.executeUpdate(sql);
  	 			System.out.println("Use_case deleted successfully!");
@@ -517,4 +630,53 @@ public class DatabaseOperator {
     	}
     	return actor_id;
 	}    
+	
+	public Line getLine(String id) {
+    	Line line = new Line();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT * FROM lines WHERE id = " + id;
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				line.id = String.valueOf(result.getInt("id"));
+				line.text = result.getString("line");
+				line.pos = result.getInt("position");
+
+			}
+			stmt.close();
+			return line;
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return null;
+	}
+
+	public void deleteInclude(String id) {
+		try {
+			stmt = c.createStatement();
+ 			String sql = "DELETE FROM includes" +
+ 			           	 " WHERE id = " + id;
+ 			stmt.executeUpdate(sql);
+ 			System.out.println("Include deleted successfully!");
+ 			stmt.close();
+		
+		} catch ( Exception e ) {
+			System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+		}
+	}
+	
+	public void deleteExtends(String id) {
+		try {
+			stmt = c.createStatement();
+ 			String sql = "DELETE FROM extends" +
+ 			           	 " WHERE id = " + id;
+ 			stmt.executeUpdate(sql);
+ 			System.out.println("Extend deleted successfully!");
+ 			stmt.close();
+		
+		} catch ( Exception e ) {
+			System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+		}
+	}
+	
 }

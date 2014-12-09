@@ -21,6 +21,7 @@ public class ViewCasoDeUso extends JPanel{
 	private UseCase use_case;	
 	
 	private JButton add_extends;
+	private JButton add_include;
 	
 	
 	private JButton add_line;
@@ -42,10 +43,15 @@ public class ViewCasoDeUso extends JPanel{
 	private Vector<JButton> line_buttons_delete;
 	private Vector<JButton> line_buttons_up;
 	private Vector<JButton> line_buttons_down;
+	private Vector<JButton> include_buttons_delete;
+	private Vector<JButton> extendes_buttons_delete;
+	
 	private JComboBox<String> actors;
 	private JComboBox<String> use_cases;
+	private JComboBox<String> lines;
 	private Vector<String> use_case_list;
 	private Vector<String> actors_list;
+	private Vector<String> lines_list;
 	
 	public ViewCasoDeUso(String id){
 		super();
@@ -57,11 +63,21 @@ public class ViewCasoDeUso extends JPanel{
 		this.line_buttons_up = new Vector<JButton>();
 		this.line_buttons_down = new Vector<JButton>();
 		this.line_position = new Vector<JLabel>();
+		this.lines_list = new Vector<String>();
+		this.include_buttons_delete = new Vector<JButton>(); 
+		this.extendes_buttons_delete = new Vector<JButton>(); 
 		for(int i = 0; i < use_case.lines.size(); i++) {
 			line_buttons_down.add(i, new JButton("\\/"));
 			line_buttons_up.add(i, new JButton("/\\"));
-			line_buttons_delete.add(i, new JButton("<>"));
+			line_buttons_delete.add(i, new JButton("Del"));
 			line_position.add(i, new JLabel(i + 1 + "."));
+			lines_list.add(String.valueOf(i));
+		}
+		for(int i = 0; i < use_case.includes.size(); i++) {
+			include_buttons_delete.add(i, new JButton("Del"));
+		}
+		for(int i = 0; i < use_case.extendes.size(); i++) {
+			extendes_buttons_delete.add(i, new JButton("Del"));
 		}
 		this.new_line = new JTextField(50);
 		this.add_line = new JButton("Add");
@@ -79,6 +95,8 @@ public class ViewCasoDeUso extends JPanel{
 		actors_list = DatabaseOperator.getInstance().listActors(use_case.project_id);
 		actors = new JComboBox<String>(actors_list);
 		
+		lines = new JComboBox<String>(lines_list);
+		
 		this.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		this.add(createMainBox());
 	}
@@ -91,8 +109,6 @@ public class ViewCasoDeUso extends JPanel{
 		Box main_box = Box.createVerticalBox();
 		
 		main_box.add(createNomeBox());
-		main_box.add(Box.createVerticalStrut(1));
-		main_box.add(createExtensionBox());
 		main_box.add(Box.createVerticalStrut(1));
 		main_box.add(createObjetivoBox());
 		main_box.add(Box.createVerticalStrut(1));
@@ -118,6 +134,14 @@ public class ViewCasoDeUso extends JPanel{
 		main_box.add(Box.createVerticalStrut(1));
 		main_box.add(createAddLineBox());
 		main_box.add(Box.createVerticalStrut(1));
+		main_box.add(createIncludesBox());
+		main_box.add(Box.createVerticalStrut(1));
+		main_box.add(createAddIncludeBox());
+		main_box.add(Box.createVerticalStrut(1));
+		main_box.add(createExtendsBox());
+		main_box.add(Box.createVerticalStrut(1));
+		main_box.add(createAddExtendBox());
+		main_box.add(Box.createVerticalStrut(1));
 		main_box.add(createExtensoesBox());
 		return main_box;
 	}
@@ -139,8 +163,7 @@ public class ViewCasoDeUso extends JPanel{
 				}
 			}
 		});
-		
-		
+			
 		return add_line_box;
 	}
 
@@ -152,7 +175,7 @@ public class ViewCasoDeUso extends JPanel{
 		return nome_box;
 	}
 	
-	public Box createExtensionBox(){
+	public Box createAddExtendBox(){
 		add_extends = new JButton("Add");
 		Box extension_box = Box.createHorizontalBox();
 		extension_box.add(new JLabel("Extends: "));
@@ -168,6 +191,26 @@ public class ViewCasoDeUso extends JPanel{
 		});
 		
 		return extension_box;
+	}
+
+	public Box createAddIncludeBox(){
+		add_include = new JButton("Add");
+		Box add_include_box = Box.createHorizontalBox();
+		add_include_box.add(new JLabel("Includes: "));
+		add_include_box.add(this.use_cases);
+		add_include_box.add(this.lines);
+		add_include_box.add(this.add_include);
+		add_include_box.setBorder(ViewCasoDeUso.BORDER);
+		add_include.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DatabaseOperator db = DatabaseOperator.getInstance();
+				db.addInclude(use_case.id, db.getUseCaseIdFromName((String)use_cases.getSelectedItem()), use_case.lines.get(Integer.getInteger((String)lines.getSelectedItem())));
+				updateScreen();
+			}
+		});
+		
+		return add_include_box;
 	}
 	
 	public Box createPreCondicoesBox(){
@@ -287,6 +330,59 @@ public class ViewCasoDeUso extends JPanel{
 		fluxo_principal_box.setBorder(ViewCasoDeUso.BORDER);
 		return fluxo_principal_box;
 	}
+	
+	public Box createIncludesBox(){
+		Box includes_box = Box.createVerticalBox();
+		JLabel label = new JLabel("Includes");
+		includes_box.add(label);
+		for(int i = 0; i < use_case.includes.size(); i++)
+		{
+			Line tempLine = DatabaseOperator.getInstance().getLine(use_case.includes.get(i).line_id);
+			UseCase tempUseCase = DatabaseOperator.getInstance().loadUseCase(use_case.includes.get(i).included_use_case_id);
+			Box tempBox = Box.createHorizontalBox();
+			tempBox.add(new JLabel(tempLine.pos + ".a"));
+			tempBox.add(new JLabel(tempUseCase.name));
+			tempBox.add(include_buttons_delete.get(i));
+			final Include include = use_case.includes.get(i);
+			include_buttons_delete.get(i).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DatabaseOperator.getInstance().deleteInclude(include.id);
+				updateScreen();
+			}
+			});
+			includes_box.add(tempBox);			
+		}
+		includes_box.setBorder(ViewCasoDeUso.BORDER);
+		return includes_box;
+	}
+	
+	public Box createExtendsBox(){
+		Box extends_box = Box.createVerticalBox();
+		JLabel label = new JLabel("Extends");
+		extends_box.add(label);
+		for(int i = 0; i < use_case.extendes.size(); i++)
+		{
+			Line tempLine = DatabaseOperator.getInstance().getLine(use_case.extendes.get(i).line_id);
+			UseCase tempUseCase = DatabaseOperator.getInstance().loadUseCase(use_case.extendes.get(i).extended_use_case_id);
+			Box tempBox = Box.createHorizontalBox();
+			tempBox.add(new JLabel(tempLine.pos + ".a"));
+			tempBox.add(new JLabel(tempUseCase.name));
+			tempBox.add(extendes_buttons_delete.get(i));
+			final Extend extend = use_case.extendes.get(i);
+			extendes_buttons_delete.get(i).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DatabaseOperator.getInstance().deleteExtends(extend.id);
+				updateScreen();
+			}
+			});
+			extends_box.add(tempBox);			
+		}
+		extends_box.setBorder(ViewCasoDeUso.BORDER);
+		return extends_box;
+	}
+
 	
 	public Box createExtensoesBox(){
 		Box extensoes_box = Box.createHorizontalBox();

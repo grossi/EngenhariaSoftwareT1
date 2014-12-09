@@ -111,7 +111,6 @@ public class ProjectScreen extends JPanel {
 		Box load_box = Box.createVerticalBox();
 		Box create_box = Box.createVerticalBox();
 		
-		
 		load_box.add(use_cases);
 		load_box.add(Box.createVerticalStrut(1));
 		load_box.add(load);
@@ -140,6 +139,4 @@ public class ProjectScreen extends JPanel {
 		
 		return main_box;
 	}
-	
-	
 }
