@@ -20,6 +20,7 @@ public class ProjectScreen extends JPanel {
 	private JButton create_use_case;
 	private JButton load;
 	private JButton delete;
+	private JButton delete_actor;
 	
 	private JComboBox<String> actors;
 	private JComboBox<String> use_cases;
@@ -43,6 +44,7 @@ public class ProjectScreen extends JPanel {
 		load = new JButton("Load");
 		
 		delete = new JButton("Delete");
+		delete_actor = new JButton("Delete Actor");
 		
 		use_case_list = DatabaseOperator.getInstance().listUseCases(id);
 		use_cases = new JComboBox<String>(use_case_list);
@@ -91,6 +93,16 @@ public class ProjectScreen extends JPanel {
 			}
 		});
 		
+		delete_actor.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DatabaseOperator db = DatabaseOperator.getInstance();
+				db.deleteActor(db.getActorIdFromName((String)actors.getSelectedItem()));
+				actors_list.remove(actors.getSelectedItem());
+				actors.setSelectedIndex(0);
+			}
+		});
+		
 		this.add(createMainBox());
 	}
 	
@@ -113,6 +125,8 @@ public class ProjectScreen extends JPanel {
 		create_box.add(new_actor_name);
 		create_box.add(Box.createVerticalStrut(1));
 		create_box.add(create_actor);
+		create_box.add(Box.createVerticalStrut(1));
+		create_box.add(delete_actor);
 		create_box.add(Box.createVerticalStrut(1));
 		
 		create_box.add(new_use_case_name);

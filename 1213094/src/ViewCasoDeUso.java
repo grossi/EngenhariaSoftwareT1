@@ -38,6 +38,7 @@ public class ViewCasoDeUso extends JPanel{
 	private ArrayList<JTextField> pontos_de_extensao_list;
 	private ArrayList<JTextField> extensoes_list;
 
+	private Vector<JLabel> line_position;
 	private Vector<JButton> line_buttons_delete;
 	private Vector<JButton> line_buttons_up;
 	private Vector<JButton> line_buttons_down;
@@ -55,10 +56,12 @@ public class ViewCasoDeUso extends JPanel{
 		this.line_buttons_delete = new Vector<JButton>();
 		this.line_buttons_up = new Vector<JButton>();
 		this.line_buttons_down = new Vector<JButton>();
+		this.line_position = new Vector<JLabel>();
 		for(int i = 0; i < use_case.lines.size(); i++) {
 			line_buttons_down.add(i, new JButton("\\/"));
 			line_buttons_up.add(i, new JButton("/\\"));
 			line_buttons_delete.add(i, new JButton("<>"));
+			line_position.add(i, new JLabel(i + 1 + "."));
 		}
 		this.new_line = new JTextField(50);
 		this.add_line = new JButton("Add");
@@ -233,6 +236,7 @@ public class ViewCasoDeUso extends JPanel{
 		for(int i = 0; i < use_case.lines.size(); i++)
 		{
 			Box tempBox = Box.createHorizontalBox();
+			tempBox.add(line_position.get(i));
 			tempBox.add(new JTextField(use_case.lines.get(i).text));
 			tempBox.add(line_buttons_delete.get(i));
 			tempBox.add(line_buttons_up.get(i));
@@ -271,8 +275,8 @@ public class ViewCasoDeUso extends JPanel{
 					db.deleteLine(temp.id);
 					temp.pos--;
 					l.pos++;
-					db.addLine(l.text, use_case.id, l.pos);
 					db.addLine(temp.text, use_case.id, temp.pos);
+					db.addLine(l.text, use_case.id, l.pos);
 					updateScreen();
 				}
 			}

@@ -487,5 +487,34 @@ public class DatabaseOperator {
 	 		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
 	 	}		
 	}
-    
+
+	public void deleteActor(String id) {
+		try {
+			stmt = c.createStatement();
+ 			String sql = "DELETE FROM actors" +
+ 			           	 " WHERE id = " + id;
+ 			stmt.executeUpdate(sql);
+ 			System.out.println("Actor deleted successfully!");
+ 			stmt.close();
+		
+		} catch ( Exception e ) {
+			System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+		}
+	}
+
+	public String getActorIdFromName(String name) {
+    	String actor_id = new String();
+    	try {
+			stmt = c.createStatement();
+			String sql = "SELECT id FROM actors WHERE name = '" + name + "'";
+			ResultSet result = stmt.executeQuery(sql);
+			while (result.next()){
+				actor_id = String.valueOf(result.getInt("id"));
+			}
+			stmt.close();
+    	} catch ( Exception e ) {
+    		System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+    	}
+    	return actor_id;
+	}    
 }
